@@ -1,0 +1,662 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MikuVids 2005</title>
+
+<style>
+    body { margin:0; font-family:Arial, sans-serif; background:#e9e9e9; }
+
+    /* TOP BAR */
+    #topbar {
+        background:#fff;
+        border-bottom:2px solid #ccc;
+        padding:10px;
+        display:flex;
+        align-items:center;
+        gap:20px;
+    }
+
+    #logo {
+        font-size:28px;
+        font-weight:bold;
+        color:#cc0000;
+    }
+
+    #search-box {
+        flex:1;
+        display:flex;
+        gap:5px;
+    }
+
+    #search-input {
+        width:100%;
+        padding:6px;
+        border:1px solid #999;
+    }
+
+    #search-btn {
+        padding:6px 12px;
+        background:#ddd;
+        border:1px solid #999;
+        cursor:pointer;
+    }
+
+    /* BUTTON BAR */
+    #button-bar {
+        background:#f2f2f2;
+        border-bottom:1px solid #ccc;
+        padding:8px;
+        display:flex;
+        gap:15px;
+        font-size:14px;
+    }
+
+    .yt-btn {
+        cursor:pointer;
+        color:#0033cc;
+        text-decoration:underline;
+    }
+
+    /* LAYOUT */
+    #layout {
+        display:flex;
+    }
+
+    /* SIDEBAR */
+    #sidebar {
+        width:180px;
+        background:#fff;
+        border-right:1px solid #ccc;
+        padding:10px;
+    }
+
+    .side-btn {
+        display:block;
+        padding:6px;
+        margin-bottom:6px;
+        background:#f7f7f7;
+        border:1px solid #ccc;
+        cursor:pointer;
+        text-align:center;
+    }
+
+    /* CONTENT */
+    #content {
+        flex:1;
+        padding:15px;
+    }
+
+    #video-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+        gap:15px;
+    }
+
+    .video-card {
+        background:#fff;
+        border:1px solid #ccc;
+        padding:10px;
+        cursor:pointer;
+    }
+
+    .video-title {
+        font-size:14px;
+        font-weight:bold;
+    }
+
+    .video-meta {
+        font-size:12px;
+        color:#555;
+    }
+
+    /* DROP-IN PAGE STYLES */
+    .rank-card {
+        background:#fff;
+        border:1px solid #ccc;
+        padding:10px;
+        margin-bottom:10px;
+    }
+
+    .badge {
+        display:inline-block;
+        padding:5px 10px;
+        background:#ffeb99;
+        border:1px solid #cc9900;
+        margin-right:5px;
+        font-size:12px;
+    }
+
+    #profile-header {
+        display:flex;
+        align-items:center;
+        gap:15px;
+    }
+
+    #profile-img {
+        width:64px;
+        height:64px;
+        border-radius:4px;
+        border:1px solid #ccc;
+        object-fit:cover;
+        background:#ddd;
+    }
+
+    table.studio-table {
+        width:100%;
+        border-collapse:collapse;
+        background:#fff;
+    }
+
+    table.studio-table th,
+    table.studio-table td {
+        border:1px solid #ccc;
+        padding:6px;
+        font-size:12px;
+    }
+
+    table.studio-table th {
+        background:#f2f2f2;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+    <div id="logo">MikuVids</div>
+
+    <div id="search-box">
+        <input id="search-input" type="text" placeholder="Search videos...">
+        <button id="search-btn">Search</button>
+    </div>
+</div>
+
+<!-- BUTTON BAR -->
+<div id="button-bar">
+    <div class="yt-btn" onclick="goHome()">Home</div>
+    <div class="yt-btn" onclick="filterCategory('mmd')">MMD</div>
+    <div class="yt-btn" onclick="filterCategory('vocaloid')">Vocaloid</div>
+    <div class="yt-btn" onclick="filterCategory('utau')">UTAU</div>
+    <div class="yt-btn" onclick="showTop39()">Top 39</div>
+    <div class="yt-btn" onclick="showUpload()">Upload</div>
+    <div class="yt-btn" onclick="showProfile()">Profile</div>
+    <div class="yt-btn" onclick="showStudio()">MikuVids Studio</div>
+</div>
+
+<!-- LAYOUT -->
+<div id="layout">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+        <div class="side-btn" onclick="goHome()">Home</div>
+        <div class="side-btn" onclick="filterCategory('mmd')">MMD Videos</div>
+        <div class="side-btn" onclick="filterCategory('vocaloid')">Vocaloid Songs</div>
+        <div class="side-btn" onclick="filterCategory('utau')">UTAU Covers</div>
+        <div class="side-btn" onclick="showTop39()">Top 39</div>
+        <div class="side-btn" onclick="showUpload()">Upload</div>
+        <div class="side-btn" onclick="showProfile()">Profile</div>
+        <div class="side-btn" onclick="showStudio()">MikuVids Studio</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="content">
+        <div id="video-grid"></div>
+    </div>
+
+</div>
+
+<script>
+window.onload = function() {
+
+    // ---------- STORAGE HELPERS ----------
+    function loadProfile() {
+        const raw = localStorage.getItem("mikuvidsProfile");
+        return raw ? JSON.parse(raw) : null;
+    }
+
+    function saveProfile(p) {
+        localStorage.setItem("mikuvidsProfile", JSON.stringify(p));
+    }
+
+    function loadUploads() {
+        const raw = localStorage.getItem("mikuvidsUploads");
+        return raw ? JSON.parse(raw) : [];
+    }
+
+    function saveUploads(u) {
+        localStorage.setItem("mikuvidsUploads", JSON.stringify(u));
+    }
+
+    function loadFlags() {
+        const raw = localStorage.getItem("mikuvidsFlags");
+        return raw ? JSON.parse(raw) : {};
+    }
+
+    function saveFlags(f) {
+        localStorage.setItem("mikuvidsFlags", JSON.stringify(f));
+    }
+
+    // ---------- INITIAL DATA ----------
+    let uploads = loadUploads();
+    if (uploads.length === 0) {
+        uploads = [
+            { id:1, title:"Miku - World is Mine (MMD)", url:"https://example.com/world-is-mine", desc:"Classic Miku performance.", category:"mmd", creator:"HatsuneStudio", views:12000, created:Date.now()-86400000 },
+            { id:2, title:"Kasane Teto - Kasane Territory", url:"https://example.com/kasane-territory", desc:"UTAU classic.", category:"utau", creator:"UTAUWorks", views:5400, created:Date.now()-43200000 },
+            { id:3, title:"Gumi - Echo Cover", url:"https://example.com/echo", desc:"Vocaloid cover.", category:"vocaloid", creator:"GreenVoice", views:8000, created:Date.now()-20000000 },
+            { id:4, title:"Miku x Luka - Magnet", url:"https://example.com/magnet", desc:"Duet.", category:"mmd", creator:"TwinCreators", views:9500, created:Date.now()-10000000 }
+        ];
+        saveUploads(uploads);
+    }
+
+    let profile = loadProfile();
+    let flags = loadFlags();
+
+    const grid = document.getElementById("video-grid");
+
+    // ---------- BADGES ----------
+    function computeBadges() {
+        const badges = [];
+        const uploadCount = uploads.length;
+
+        if (uploadCount >= 1) badges.push("First Upload");
+        if (uploadCount >= 3) badges.push("Uploader Lv.2");
+
+        if (flags.studioOpened) badges.push("Studio User");
+
+        const today = new Date();
+        if (today.getMonth() === 2 && today.getDate() === 9) {
+            badges.push("Miku Day 3/9");
+        }
+
+        const top39Ids = getTop39Ids();
+        const hasTop = uploads.some(u => top39Ids.includes(u.id));
+        if (hasTop) badges.push("Top 39 Winner");
+
+        return badges;
+    }
+
+    function getTop39Ids() {
+        const sorted = [...uploads].sort((a,b)=>b.views - a.views);
+        return sorted.slice(0,39).map(u=>u.id);
+    }
+
+    // ---------- RENDER HOME ----------
+    function renderVideos(list) {
+        grid.innerHTML = "";
+        if (list.length === 0) {
+            grid.innerHTML = "<p>No videos found.</p>";
+            return;
+        }
+        list.forEach(v => {
+            grid.innerHTML += `
+                <div class="video-card" onclick="openVideo(${v.id})">
+                    <div class="video-title">${v.title}</div>
+                    <div class="video-meta">${v.creator || "Unknown"} – ${v.views} views</div>
+                </div>
+            `;
+        });
+    }
+
+    window.openVideo = function(id) {
+        const v = uploads.find(u=>u.id===id);
+        if (!v) return;
+        window.open(v.url, "_blank");
+        v.views += 1;
+        saveUploads(uploads);
+    };
+
+    function showHome() {
+        renderVideos(uploads);
+    }
+
+    showHome();
+
+    // ---------- SEARCH ----------
+    document.getElementById("search-btn").onclick = function() {
+        const q = document.getElementById("search-input").value.toLowerCase();
+        const filtered = uploads.filter(v =>
+            v.title.toLowerCase().includes(q) ||
+            v.desc.toLowerCase().includes(q) ||
+            (v.creator || "").toLowerCase().includes(q)
+        );
+        renderVideos(filtered);
+    };
+
+    // ---------- CATEGORY FILTER ----------
+    window.filterCategory = function(cat) {
+        const filtered = uploads.filter(v => v.category === cat);
+        renderVideos(filtered);
+    };
+
+    window.goHome = function() {
+        showHome();
+    };
+
+    // ---------- TOP 39 ----------
+    window.showTop39 = function() {
+        const sorted = [...uploads].sort((a,b)=>b.views - a.views).slice(0,39);
+        grid.innerHTML = "<h2>Today's Top 39 Videos</h2>";
+        sorted.forEach((v,i)=>{
+            grid.innerHTML += `
+                <div class="rank-card">
+                    <b>#${i+1}</b> ${v.title}<br>
+                    <span class="video-meta">${v.creator || "Unknown"} – ${v.views} views</span>
+                </div>
+            `;
+        });
+    };
+
+    // ---------- UPLOAD ----------
+    window.showUpload = function() {
+        grid.innerHTML = `
+            <h2>Upload Video</h2>
+            <div class="rank-card">
+                <p><b>Video URL:</b></p>
+                <input type="text" id="upload-url" style="width:100%;" placeholder="https://..."><br><br>
+
+                <p><b>Title:</b></p>
+                <input type="text" id="upload-title" style="width:100%;"><br><br>
+
+                <p><b>Description:</b></p>
+                <textarea id="upload-desc" style="width:100%; height:80px;"></textarea><br><br>
+
+                <p><b>Category:</b></p>
+                <select id="upload-cat" style="width:100%;">
+                    <option value="mmd">MMD</option>
+                    <option value="vocaloid">Vocaloid</option>
+                    <option value="utau">UTAU</option>
+                </select><br><br>
+
+                <button id="upload-btn" style="padding:6px 12px;">Upload</button>
+                <p id="upload-status"></p>
+            </div>
+        `;
+
+        document.getElementById("upload-btn").onclick = function() {
+            const url = document.getElementById("upload-url").value.trim();
+            const title = document.getElementById("upload-title").value.trim();
+            const desc = document.getElementById("upload-desc").value.trim();
+            const cat = document.getElementById("upload-cat").value;
+
+            if (!url || !title) {
+                document.getElementById("upload-status").innerText = "Please enter a URL and title.";
+                return;
+            }
+
+            const newId = uploads.length ? Math.max(...uploads.map(u=>u.id))+1 : 1;
+            const creatorName = profile && profile.name ? profile.name : "Guest";
+
+            uploads.push({
+                id:newId,
+                title,
+                url,
+                desc,
+                category:cat,
+                creator:creatorName,
+                views:0,
+                created:Date.now()
+            });
+            saveUploads(uploads);
+
+            document.getElementById("upload-status").innerText = "Upload saved! (Prototype)";
+        };
+    };
+
+    // ---------- PROFILE ----------
+    window.showProfile = function() {
+        if (!profile) {
+            showProfileCreation();
+            return;
+        }
+
+        const badges = computeBadges();
+
+        grid.innerHTML = `
+            <h2>Your Profile</h2>
+            <div class="rank-card">
+                <div id="profile-header">
+                    <img id="profile-img" src="${profile.image || ""}" alt="Profile">
+                    <div>
+                        <h3>${profile.name}</h3>
+                        <p>Joined: ${profile.joined || "Unknown"}</p>
+                    </div>
+                </div>
+                <p><b>Badges:</b></p>
+                <div id="badge-list"></div>
+                <br>
+                <button id="edit-profile-btn" style="padding:4px 8px;">Edit Profile</button>
+            </div>
+
+            <h3>Your Uploads</h3>
+            <div id="profile-uploads"></div>
+        `;
+
+        const badgeList = document.getElementById("badge-list");
+        if (badges.length === 0) {
+            badgeList.innerHTML = "<span class='video-meta'>No badges yet. Try uploading videos or using Studio.</span>";
+        } else {
+            badges.forEach(b=>{
+                badgeList.innerHTML += `<div class="badge">${b}</div>`;
+            });
+        }
+
+        const myUploads = uploads.filter(u => (u.creator || "") === profile.name);
+        const pu = document.getElementById("profile-uploads");
+        if (myUploads.length === 0) {
+            pu.innerHTML = "<p>No uploads yet.</p>";
+        } else {
+            myUploads.forEach(v=>{
+                pu.innerHTML += `
+                    <div class="video-card" onclick="openVideo(${v.id})">
+                        <div class="video-title">${v.title}</div>
+                        <div class="video-meta">${v.views} views</div>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById("edit-profile-btn").onclick = function() {
+            showProfileCreation(true);
+        };
+    };
+
+    function showProfileCreation(isEdit) {
+        const existingName = profile ? profile.name : "";
+        grid.innerHTML = `
+            <h2>${isEdit ? "Edit Profile" : "Create Profile"}</h2>
+            <div class="rank-card">
+                <p><b>Username:</b></p>
+                <input type="text" id="prof-name" style="width:100%;" value="${existingName}"><br><br>
+
+                <p><b>Profile Image:</b></p>
+                <input type="file" id="prof-img-file" accept="image/*"><br><br>
+
+                <button id="save-prof-btn" style="padding:6px 12px;">Save Profile</button>
+                <p id="prof-status"></p>
+            </div>
+        `;
+
+        document.getElementById("save-prof-btn").onclick = function() {
+            const name = document.getElementById("prof-name").value.trim();
+            if (!name) {
+                document.getElementById("prof-status").innerText = "Please enter a username.";
+                return;
+            }
+
+            const fileInput = document.getElementById("prof-img-file");
+            const file = fileInput.files[0];
+
+            function finishSave(imgData) {
+                const joined = profile && profile.joined ? profile.joined : new Date().toLocaleDateString();
+                profile = { name, image:imgData || (profile ? profile.image : ""), joined };
+                saveProfile(profile);
+                document.getElementById("prof-status").innerText = "Profile saved!";
+            }
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    finishSave(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                finishSave(null);
+            }
+        };
+    }
+
+    // ---------- STUDIO ----------
+    window.showStudio = function() {
+        flags.studioOpened = true;
+        saveFlags(flags);
+
+        const myName = profile && profile.name ? profile.name : null;
+        const myUploads = myName ? uploads.filter(u=>u.creator===myName) : [];
+
+        grid.innerHTML = `
+            <h2>MikuVids Studio</h2>
+            <p class="video-meta">Manage your uploads, see views, and grow your channel.</p>
+            <br>
+            <table class="studio-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Views</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studio-body"></tbody>
+            </table>
+            <br>
+            <p class="video-meta">${myName ? "" : "Create a profile to start uploading and managing videos."}</p>
+        `;
+
+        const body = document.getElementById("studio-body");
+        if (!myName || myUploads.length === 0) {
+            body.innerHTML = `<tr><td colspan="4">No uploads to manage.</td></tr>`;
+        } else {
+            myUploads.forEach(v=>{
+                body.innerHTML += `
+                    <tr>
+                        <td>${v.title}</td>
+                        <td>${v.category}</td>
+                        <td>${v.views}</td>
+                        <td>
+                            <button onclick="studioView(${v.id})">View</button>
+                            <button onclick="studioDelete(${v.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+    };
+
+    window.studioView = function(id) {
+        openVideo(id);
+        showStudio();
+    };
+
+    window.studioDelete = function(id) {
+        if (!confirm("Delete this video?")) return;
+        uploads = uploads.filter(u=>u.id!==id);
+        saveUploads(uploads);
+        showStudio();
+    };
+
+};
+</script>
+ <script>
+// DROP-IN: Upload area with Select File + Auto URL Generator
+window.showUpload = function() {
+    const grid = document.getElementById("video-grid");
+
+    grid.innerHTML = `
+        <h2>Upload Video</h2>
+        <div class="rank-card">
+
+            <p><b>Select Video File:</b></p>
+            <input type="file" id="upload-file" accept="video/*"><br><br>
+
+            <p><b>OR paste a video URL:</b></p>
+            <input type="text" id="upload-url" style="width:100%;" placeholder="https://..."><br><br>
+
+            <p><b>Title:</b></p>
+            <input type="text" id="upload-title" style="width:100%;"><br><br>
+
+            <p><b>Description:</b></p>
+            <textarea id="upload-desc" style="width:100%; height:80px;"></textarea><br><br>
+
+            <p><b>Category:</b></p>
+            <select id="upload-cat" style="width:100%;">
+                <option value="mmd">MMD</option>
+                <option value="vocaloid">Vocaloid</option>
+                <option value="utau">UTAU</option>
+            </select><br><br>
+
+            <button id="upload-btn" style="padding:6px 12px;">Upload</button>
+            <p id="upload-status"></p>
+        </div>
+    `;
+
+    document.getElementById("upload-btn").onclick = function() {
+        const fileInput = document.getElementById("upload-file");
+        const file = fileInput.files[0];
+        const pastedURL = document.getElementById("upload-url").value.trim();
+        const title = document.getElementById("upload-title").value.trim();
+        const desc = document.getElementById("upload-desc").value.trim();
+        const cat = document.getElementById("upload-cat").value;
+
+        if (!file && !pastedURL) {
+            document.getElementById("upload-status").innerText = "Please select a file OR paste a URL.";
+            return;
+        }
+
+        if (!title) {
+            document.getElementById("upload-status").innerText = "Please enter a title.";
+            return;
+        }
+
+        // Load existing uploads
+        let uploads = JSON.parse(localStorage.getItem("mikuvidsUploads") || "[]");
+
+        // Generate unique ID
+        const newId = uploads.length ? Math.max(...uploads.map(u=>u.id))+1 : 1;
+
+        // AUTO URL GENERATOR
+        const autoURL = "https://mikuvids.com/watch?v=MV-" + String(newId).padStart(6, "0");
+
+        // If file uploaded, create local preview URL
+        let videoURL = pastedURL;
+        if (file) {
+            videoURL = URL.createObjectURL(file);
+        }
+
+        // Load profile
+        const profile = JSON.parse(localStorage.getItem("mikuvidsProfile") || "{}");
+        const creatorName = profile.name || "Guest";
+
+        // Save upload
+        uploads.push({
+            id: newId,
+            title,
+            url: videoURL,
+            autoURL,
+            desc,
+            category: cat,
+            creator: creatorName,
+            views: 0,
+            created: Date.now()
+        });
+
+        localStorage.setItem("mikuvidsUploads", JSON.stringify(uploads));
+
+        document.getElementById("upload-status").innerHTML =
+            `Upload complete!<br>Your video URL:<br><b>${autoURL}</b>`;
+    };
+};
+</script>
+</body>
+</html>

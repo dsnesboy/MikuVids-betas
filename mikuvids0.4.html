@@ -1,0 +1,296 @@
+  <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MikuVids 2005</title>
+
+<style>
+    body { margin:0; font-family:Arial; background:#e9e9e9; }
+
+    /* TOP BAR */
+    #topbar {
+        background:#fff;
+        border-bottom:2px solid #ccc;
+        padding:10px;
+        display:flex;
+        align-items:center;
+        gap:20px;
+    }
+
+    #logo {
+        font-size:28px;
+        font-weight:bold;
+        color:#cc0000;
+    }
+
+    #search-box {
+        flex:1;
+        display:flex;
+        gap:5px;
+    }
+
+    #search-input {
+        width:100%;
+        padding:6px;
+        border:1px solid #999;
+    }
+
+    #search-btn {
+        padding:6px 12px;
+        background:#ddd;
+        border:1px solid #999;
+        cursor:pointer;
+    }
+
+    /* BUTTON BAR */
+    #button-bar {
+        background:#f2f2f2;
+        border-bottom:1px solid #ccc;
+        padding:8px;
+        display:flex;
+        gap:15px;
+        font-size:14px;
+    }
+
+    .yt-btn {
+        cursor:pointer;
+        color:#0033cc;
+        text-decoration:underline;
+    }
+
+    /* LAYOUT */
+    #layout {
+        display:flex;
+    }
+
+    /* SIDEBAR */
+    #sidebar {
+        width:180px;
+        background:#fff;
+        border-right:1px solid #ccc;
+        padding:10px;
+    }
+
+    .side-btn {
+        display:block;
+        padding:6px;
+        margin-bottom:6px;
+        background:#f7f7f7;
+        border:1px solid #ccc;
+        cursor:pointer;
+        text-align:center;
+    }
+
+    /* CONTENT */
+    #content {
+        flex:1;
+        padding:15px;
+    }
+
+    #video-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+        gap:15px;
+    }
+
+    .video-card {
+        background:#fff;
+        border:1px solid #ccc;
+        padding:10px;
+    }
+
+    .video-title {
+        font-size:14px;
+        font-weight:bold;
+    }
+
+    .video-meta {
+        font-size:12px;
+        color:#555;
+    }
+
+    /* DROP-IN PAGE STYLES */
+    .rank-card {
+        background:#fff;
+        border:1px solid #ccc;
+        padding:10px;
+        margin-bottom:10px;
+    }
+
+    .badge {
+        display:inline-block;
+        padding:5px 10px;
+        background:#ffeb99;
+        border:1px solid #cc9900;
+        margin-right:5px;
+        font-size:12px;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+    <div id="logo">MikuVids</div>
+
+    <div id="search-box">
+        <input id="search-input" type="text" placeholder="Search videos...">
+        <button id="search-btn">Search</button>
+    </div>
+</div>
+
+<!-- BUTTON BAR -->
+<div id="button-bar">
+    <div class="yt-btn" onclick="goHome()">Home</div>
+    <div class="yt-btn" onclick="filterCategory('mmd')">MMD</div>
+    <div class="yt-btn" onclick="filterCategory('vocaloid')">Vocaloid</div>
+    <div class="yt-btn" onclick="filterCategory('utau')">UTAU</div>
+    <div class="yt-btn" onclick="showTop39()">Top 39</div>
+    <div class="yt-btn" onclick="showUpload()">Upload</div>
+    <div class="yt-btn" onclick="showProfile()">Profile</div>
+</div>
+
+<!-- LAYOUT -->
+<div id="layout">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+        <div class="side-btn" onclick="goHome()">Home</div>
+        <div class="side-btn" onclick="filterCategory('mmd')">MMD Videos</div>
+        <div class="side-btn" onclick="filterCategory('vocaloid')">Vocaloid Songs</div>
+        <div class="side-btn" onclick="filterCategory('utau')">UTAU Covers</div>
+        <div class="side-btn" onclick="showTop39()">Top 39</div>
+        <div class="side-btn" onclick="showUpload()">Upload</div>
+        <div class="side-btn" onclick="showProfile()">Profile</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div id="content">
+        <div id="video-grid"></div>
+    </div>
+
+</div>
+
+<script>
+window.onload = function() {
+
+    /* VIDEO DATA */
+    const videos = [
+        { title:"Miku - World is Mine (MMD)", tags:"mmd vocaloid miku", creator:"HatsuneStudio" },
+        { title:"Kasane Teto - Kasane Territory", tags:"utau teto", creator:"UTAUWorks" },
+        { title:"Gumi - Echo Cover", tags:"vocaloid gumi cover", creator:"GreenVoice" },
+        { title:"Miku x Luka - Magnet", tags:"mmd vocaloid duet", creator:"TwinCreators" }
+    ];
+
+    const grid = document.getElementById("video-grid");
+
+    function renderVideos(list) {
+        grid.innerHTML = "";
+        list.forEach(v => {
+            grid.innerHTML += `
+                <div class="video-card">
+                    <div class="video-title">${v.title}</div>
+                    <div class="video-meta">${v.creator}</div>
+                </div>
+            `;
+        });
+    }
+
+    renderVideos(videos);
+
+    /* SEARCH */
+    document.getElementById("search-btn").onclick = function() {
+        const q = document.getElementById("search-input").value.toLowerCase();
+        const filtered = videos.filter(v =>
+            v.title.toLowerCase().includes(q) ||
+            v.tags.toLowerCase().includes(q) ||
+            v.creator.toLowerCase().includes(q)
+        );
+        renderVideos(filtered);
+    };
+
+    /* CATEGORY FILTER */
+    window.filterCategory = function(cat) {
+        const filtered = videos.filter(v => v.tags.includes(cat));
+        renderVideos(filtered);
+    };
+
+    /* HOME */
+    window.goHome = function() {
+        renderVideos(videos);
+    };
+
+    /* DROP-IN: TOP 39 */
+    window.showTop39 = function() {
+        grid.innerHTML = `
+            <h2>Today's Top 39 Videos</h2>
+            <div class="rank-card"><b>#1</b> Miku – World is Mine <br><span class="video-meta">HatsuneStudio</span></div>
+            <div class="rank-card"><b>#2</b> Teto – Kasane Territory <br><span class="video-meta">UTAUWorks</span></div>
+            <div class="rank-card"><b>#3</b> Gumi – Echo <br><span class="video-meta">GreenVoice</span></div>
+            <div class="rank-card"><b>#4</b> Miku x Luka – Magnet <br><span class="video-meta">TwinCreators</span></div>
+        `;
+    };
+
+    /* DROP-IN: PROFILE */
+    window.showProfile = function() {
+        grid.innerHTML = `
+            <h2>Your Profile</h2>
+            <div class="rank-card">
+                <h3>HatsuneStudio</h3>
+                <p>Joined: March 2026</p>
+                <p><b>Badges:</b></p>
+                <div class="badge">Top 39 Winner</div>
+                <div class="badge">Miku Day 3/9</div>
+            </div>
+
+            <h3>Your Uploads</h3>
+            <div class="video-card">
+                <div class="video-title">World is Mine (MMD)</div>
+                <div class="video-meta">12,000 views</div>
+            </div>
+
+            <div class="video-card">
+                <div class="video-title">Miku Dance Test</div>
+                <div class="video-meta">5,400 views</div>
+            </div>
+        `;
+    };
+
+    /* DROP-IN: UPLOAD */
+    window.showUpload = function() {
+        grid.innerHTML = `
+            <h2>Upload Video</h2>
+            <div class="rank-card">
+                <p><b>Select File:</b></p>
+                <input type="file" id="upload-file"><br><br>
+
+                <p><b>Title:</b></p>
+                <input type="text" id="upload-title" style="width:100%;"><br><br>
+
+                <p><b>Description:</b></p>
+                <textarea id="upload-desc" style="width:100%; height:80px;"></textarea><br><br>
+
+                <button id="upload-btn" style="padding:6px 12px;">Upload</button>
+                <p id="upload-status"></p>
+            </div>
+        `;
+
+        document.getElementById("upload-btn").onclick = function() {
+            const file = document.getElementById("upload-file").value;
+            const title = document.getElementById("upload-title").value;
+
+            if (!file || !title) {
+                document.getElementById("upload-status").innerText = "Please select a file and enter a title.";
+                return;
+            }
+
+            document.getElementById("upload-status").innerText = "Upload complete! (Prototype)";
+        };
+    };
+
+};
+</script>
+
+</body>
+</html>

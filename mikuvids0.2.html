@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MikuVids</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: #f0ffff;
+    }
+
+    #miku-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #39c5bb;
+        padding: 10px 20px;
+        color: white;
+    }
+
+    #miku-logo {
+        font-size: 26px;
+        font-weight: bold;
+    }
+
+    #miku-search {
+        width: 300px;
+        padding: 8px 12px;
+        border-radius: 20px;
+        border: none;
+        outline: none;
+        font-size: 15px;
+    }
+
+    #miku-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .miku-btn {
+        background: white;
+        color: #39c5bb;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .miku-btn:hover {
+        background: #e0ffff;
+    }
+
+    #video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .video-card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+
+    .video-title {
+        font-weight: bold;
+        margin-top: 6px;
+    }
+</style>
+</head>
+
+<body>
+
+<div id="miku-header">
+    <div id="miku-logo">MikuVids</div>
+
+    <input id="miku-search" type="text" placeholder="Search MMD, Vocaloid, UTAU…">
+
+    <div id="miku-buttons">
+        <button class="miku-btn" onclick="filterCategory('mmd')">MMD</button>
+        <button class="miku-btn" onclick="filterCategory('vocaloid')">Vocaloid</button>
+        <button class="miku-btn" onclick="filterCategory('utau')">UTAU</button>
+    </div>
+</div>
+
+<div id="video-grid"></div>
+
+<script>
+window.onload = function() {
+
+    const videos = [
+        { title: "Miku - World is Mine (MMD)", tags: "mmd vocaloid miku", creator: "HatsuneStudio" },
+        { title: "Kasane Teto - Kasane Territory", tags: "utau teto", creator: "UTAUWorks" },
+        { title: "Gumi - Echo Cover", tags: "vocaloid gumi cover", creator: "GreenVoice" },
+        { title: "Miku x Luka - Magnet", tags: "mmd vocaloid duet", creator: "TwinCreators" }
+    ];
+
+    const grid = document.getElementById("video-grid");
+
+    function renderVideos(list) {
+        grid.innerHTML = "";
+        list.forEach(v => {
+            grid.innerHTML += `
+                <div class="video-card">
+                    <div class="video-title">${v.title}</div>
+                    <div class="video-meta">${v.creator}</div>
+                </div>
+            `;
+        });
+    }
+
+    renderVideos(videos);
+
+    // SEARCH BAR FIXED
+    document.getElementById("miku-search").addEventListener("input", function () {
+        const q = this.value.toLowerCase();
+        const filtered = videos.filter(v =>
+            v.title.toLowerCase().includes(q) ||
+            v.tags.toLowerCase().includes(q) ||
+            v.creator.toLowerCase().includes(q)
+        );
+        renderVideos(filtered);
+    });
+
+    // CATEGORY BUTTONS FIXED
+    window.filterCategory = function(cat) {
+        const filtered = videos.filter(v => v.tags.includes(cat));
+        renderVideos(filtered);
+    };
+
+};
+</script>
+
+</body>
+</html>
