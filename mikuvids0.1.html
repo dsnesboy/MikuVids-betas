@@ -1,0 +1,985 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>MikuVids – MMD / Vocaloid / UTAU</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+    :root {
+        --bg: #050814;
+        --bg-soft: #0b1224;
+        --accent: #39c5bb;
+        --accent-soft: #aeefff;
+        --accent-strong: #00ffd5;
+        --text: #f5f7ff;
+        --muted: #9aa4c6;
+        --danger: #ff6b9c;
+        --badge-daily: #39c5bb;
+        --badge-weekly: #ffb7d5;
+        --badge-monthly: #aeefff;
+        --badge-legend: #ffd700;
+    }
+
+    body.miku-day {
+        --bg: #0f1020;
+        --bg-soft: #181a34;
+        --accent: #39c5bb;
+        --accent-soft: #ffb7d5;
+        --accent-strong: #ffffff;
+        --badge-daily: #39c5bb;
+        --badge-weekly: #ffb7d5;
+        --badge-monthly: #ffffff;
+        --badge-legend: #ffb7d5;
+        background-image:
+            radial-gradient(circle at 10% 20%, rgba(57,197,187,0.25) 0, transparent 55%),
+            radial-gradient(circle at 90% 80%, rgba(255,183,213,0.25) 0, transparent 55%);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 260px;
+        background: linear-gradient(180deg, #050814 0%, #050814 40%, #0b1224 100%);
+        border-right: 1px solid rgba(255,255,255,0.06);
+        padding: 16px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+
+    .logo-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 20%, #ffffff 0, #39c5bb 40%, #0b1224 100%);
+        box-shadow: 0 0 18px rgba(57,197,187,0.8);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .logo-icon::after {
+        content: "39";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 800;
+        color: #050814;
+        text-shadow: 0 0 4px rgba(255,255,255,0.8);
+    }
+
+    body.miku-day .logo-icon::after {
+        content: "3/9";
+    }
+
+    .logo-text-main {
+        font-size: 16px;
+        text-transform: none;
+    }
+
+    .logo-sub {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .nav-section-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin-top: 8px;
+        margin-bottom: 4px;
+    }
+
+    .nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s, transform 0.1s;
+    }
+
+    .nav-item span.icon {
+        width: 18px;
+        text-align: center;
+    }
+
+    .nav-item.active,
+    .nav-item:hover {
+        background: rgba(57,197,187,0.12);
+        color: var(--accent-soft);
+        transform: translateY(-1px);
+    }
+
+    .nav-item.active {
+        color: var(--accent-strong);
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        font-size: 11px;
+        color: var(--muted);
+        border-top: 1px solid rgba(255,255,255,0.06);
+        padding-top: 10px;
+    }
+
+    .miku-day-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(255,183,213,0.12);
+        color: #ffb7d5;
+        font-size: 11px;
+        margin-top: 6px;
+    }
+
+    body.miku-day .miku-day-pill {
+        background: rgba(57,197,187,0.16);
+        color: var(--accent-soft);
+    }
+
+    .miku-day-pill span {
+        font-size: 13px;
+    }
+
+    .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: radial-gradient(circle at top left, rgba(57,197,187,0.18) 0, transparent 55%),
+                                radial-gradient(circle at bottom right, rgba(10,20,60,0.9) 0, #050814 55%);
+    }
+
+    .topbar {
+        display: flex;
+        align-items: center;
+        padding: 10px 18px;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        backdrop-filter: blur(12px);
+        background: linear-gradient(90deg, rgba(5,8,20,0.9), rgba(5,8,20,0.6));
+    }
+
+    .search-box {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(5,8,20,0.9);
+        border-radius: 999px;
+        padding: 6px 10px;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .search-box input {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        font-size: 13px;
+    }
+
+    .search-box span {
+        font-size: 14px;
+        color: var(--muted);
+    }
+
+    .filter-select {
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(5,8,20,0.9);
+        color: var(--text);
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .upload-btn {
+        border-radius: 999px;
+        border: none;
+        background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+        color: #050814;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 7px 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        box-shadow: 0 0 12px rgba(57,197,187,0.7);
+    }
+
+    .upload-btn span.icon {
+        font-size: 15px;
+    }
+
+    .content {
+        display: grid;
+        grid-template-columns: minmax(0, 2.2fr) minmax(260px, 1.1fr);
+        gap: 0;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .feed {
+        padding: 14px 18px 18px;
+        overflow-y: auto;
+    }
+
+    .feed-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .feed-title {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .feed-subtitle {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 12px;
+    }
+
+    .video-card {
+        background: rgba(5,8,20,0.9);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.06);
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+        transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+        position: relative;
+    }
+
+    .video-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0,0,0,0.6);
+        border-color: rgba(57,197,187,0.7);
+    }
+
+    .thumb {
+        position: relative;
+        background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.2) 0, transparent 40%),
+                                radial-gradient(circle at 80% 80%, rgba(57,197,187,0.4) 0, transparent 55%);
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.7);
+        font-size: 11px;
+    }
+
+    .thumb::after {
+        content: "MMD / Vocaloid / UTAU";
+        position: absolute;
+        bottom: 6px;
+        right: 8px;
+        font-size: 9px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: rgba(5,8,20,0.8);
+        color: var(--accent-soft);
+    }
+
+    .thumb-badge {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        padding: 3px 7px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(5,8,20,0.9);
+        border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .thumb-badge span.icon {
+        font-size: 11px;
+    }
+
+    .thumb-badge.daily { color: var(--badge-daily); }
+    .thumb-badge.weekly { color: var(--badge-weekly); }
+    .thumb-badge.monthly { color: var(--badge-monthly); }
+    .thumb-badge.legend { color: var(--badge-legend); }
+
+    body.miku-day .thumb-badge.miku-day {
+        animation: mikuDayPulse 1.6s infinite alternate;
+    }
+
+    @keyframes mikuDayPulse {
+        0% { box-shadow: 0 0 6px rgba(57,197,187,0.6); transform: translateY(0); }
+        100% { box-shadow: 0 0 14px rgba(255,183,213,0.9); transform: translateY(-1px); }
+    }
+
+    .video-meta {
+        padding: 8px 10px 9px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .video-title {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .video-info-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .video-tags {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-top: 2px;
+    }
+
+    .tag-pill {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.04);
+        color: var(--muted);
+    }
+
+    .tag-pill.primary {
+        background: rgba(57,197,187,0.16);
+        color: var(--accent-soft);
+    }
+
+    .player-panel {
+        border-left: 1px solid rgba(255,255,255,0.06);
+        background: linear-gradient(180deg, rgba(5,8,20,0.96), rgba(5,8,20,0.98));
+        padding: 12px 14px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .player-video {
+        width: 100%;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #000;
+        border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .player-video video {
+        width: 100%;
+        display: block;
+        background: #000;
+    }
+
+    .player-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-top: 6px;
+    }
+
+    .player-sub {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .player-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 4px;
+    }
+
+    .miku-assistant {
+        margin-top: 8px;
+        border-radius: 12px;
+        padding: 8px 9px;
+        background: radial-gradient(circle at 0 0, rgba(57,197,187,0.3) 0, transparent 55%),
+                                radial-gradient(circle at 100% 100%, rgba(255,183,213,0.2) 0, transparent 55%),
+                                rgba(5,8,20,0.96);
+        border: 1px solid rgba(255,255,255,0.12);
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 8px;
+        align-items: center;
+    }
+
+    .miku-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 20%, #ffffff 0, #39c5bb 40%, #050814 100%);
+        box-shadow: 0 0 12px rgba(57,197,187,0.9);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .miku-avatar::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(135deg, rgba(5,8,20,0.0) 0, rgba(5,8,20,0.6) 40%, rgba(5,8,20,0.9) 100%),
+            radial-gradient(circle at 30% 20%, rgba(255,255,255,0.7) 0, transparent 40%);
+        mix-blend-mode: screen;
+    }
+
+    .miku-text-main {
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .miku-text-sub {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 2px;
+    }
+
+    .miku-stat-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 10px;
+        color: var(--muted);
+    }
+
+    .badge-legendary-label {
+        font-size: 10px;
+        color: var(--badge-legend);
+    }
+
+    .upload-panel {
+        margin-top: 6px;
+        border-radius: 10px;
+        padding: 8px 9px;
+        background: rgba(5,8,20,0.96);
+        border: 1px dashed rgba(255,255,255,0.18);
+        font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .upload-row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .upload-panel input[type="text"] {
+        flex: 1;
+        min-width: 120px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(5,8,20,0.9);
+        color: var(--text);
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+
+    .upload-panel select {
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(5,8,20,0.9);
+        color: var(--text);
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+
+    .upload-panel input[type="file"] {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .upload-panel button {
+        border-radius: 999px;
+        border: none;
+        background: rgba(57,197,187,0.18);
+        color: var(--accent-soft);
+        font-size: 11px;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    .upload-panel button:hover {
+        background: rgba(57,197,187,0.3);
+    }
+
+    .top39-banner {
+        margin-top: 4px;
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .top39-banner span {
+        color: var(--accent-soft);
+        font-weight: 600;
+    }
+
+    .pill-small {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 6px;
+        border-radius: 999px;
+        font-size: 10px;
+        background: rgba(57,197,187,0.16);
+        color: var(--accent-soft);
+    }
+
+    body.miku-day .pill-small {
+        background: rgba(255,183,213,0.16);
+        color: var(--accent-soft);
+    }
+
+    .pill-small span.icon {
+        font-size: 11px;
+    }
+
+    .empty-state {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 10px;
+    }
+
+    @media (max-width: 900px) {
+        .content {
+            grid-template-columns: minmax(0, 1fr);
+        }
+        .player-panel {
+            border-left: none;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+    }
+
+    @media (max-width: 720px) {
+        .sidebar {
+            display: none;
+        }
+    }
+</style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <div>
+                <div class="logo-text-main">MikuVids</div>
+                <div class="logo-sub">MMD • Vocaloid • UTAU</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="nav-section-title">Browse</div>
+            <ul class="nav-list">
+                <li class="nav-item active"><span class="icon">🏠</span>Home</li>
+                <li class="nav-item"><span class="icon">📈</span>Top 39</li>
+                <li class="nav-item"><span class="icon">🎵</span>Vocaloid</li>
+                <li class="nav-item"><span class="icon">💃</span>MMD</li>
+                <li class="nav-item"><span class="icon">🎙️</span>UTAU</li>
+            </ul>
+        </div>
+
+        <div>
+            <div class="nav-section-title">Creator</div>
+            <ul class="nav-list">
+                <li class="nav-item"><span class="icon">📹</span>Your videos</li>
+                <li class="nav-item"><span class="icon">⭐</span>Achievements</li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <div>Special event:</div>
+            <div class="miku-day-pill">
+                <span>🌸</span>
+                <span>Miku Day – March 9</span>
+            </div>
+            <div style="margin-top:6px;">
+                Top <span style="color:var(--accent-soft);font-weight:600;">39</span> videos earn a badge.
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="search-box">
+                <span>🔍</span>
+                <input id="searchInput" type="text" placeholder="Search MMD, Vocaloid, UTAU videos…" />
+            </div>
+            <select id="filterCategory" class="filter-select">
+                <option value="all">All categories</option>
+                <option value="MMD">MMD</option>
+                <option value="Vocaloid">Vocaloid</option>
+                <option value="UTAU">UTAU</option>
+            </select>
+            <button class="upload-btn" id="openUpload">
+                <span class="icon">⬆️</span>
+                <span>Upload</span>
+            </button>
+        </header>
+
+        <section class="content">
+            <section class="feed">
+                <div class="feed-header">
+                    <div>
+                        <div class="feed-title">For you</div>
+                        <div class="feed-subtitle">
+                            Only MMD, Vocaloid, and UTAU content. Top <span style="color:var(--accent-soft);font-weight:600;">39</span> earn badges.
+                        </div>
+                    </div>
+                    <div class="pill-small">
+                        <span class="icon">🏅</span>
+                        <span>Top 39 system active</span>
+                    </div>
+                </div>
+
+                <div id="videoGrid" class="video-grid"></div>
+                <div id="emptyState" class="empty-state" style="display:none;">
+                    No videos yet. Upload something MMD / Vocaloid / UTAU to start your MikuVids world.
+                </div>
+            </section>
+
+            <aside class="player-panel">
+                <div class="player-video">
+                    <video id="player" controls></video>
+                </div>
+                <div class="player-title" id="playerTitle">No video selected</div>
+                <div class="player-sub" id="playerMeta">Upload a video to begin.</div>
+                <div class="player-tags" id="playerTags"></div>
+
+                <div class="miku-assistant">
+                    <div class="miku-avatar"></div>
+                    <div>
+                        <div class="miku-text-main" id="mikuMainText">
+                            Welcome to MikuVids!
+                        </div>
+                        <div class="miku-text-sub" id="mikuSubText">
+                            Upload MMD, Vocaloid, or UTAU videos. Miku will track your Top 39 badges.
+                        </div>
+                        <div class="miku-stat-row">
+                            <div id="mikuStatVideos">Videos: 0</div>
+                            <div id="mikuStatBadges" class="badge-legendary-label">Top 39 badges: 0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upload-panel" id="uploadPanel" style="display:none;">
+                    <div><strong>Upload a new video</strong></div>
+                    <div class="upload-row">
+                        <input id="uploadTitle" type="text" placeholder="Video title" />
+                        <select id="uploadCategory">
+                            <option value="MMD">MMD</option>
+                            <option value="Vocaloid">Vocaloid</option>
+                            <option value="UTAU">UTAU</option>
+                        </select>
+                    </div>
+                    <div class="upload-row">
+                        <input id="uploadTags" type="text" placeholder="Tags (comma separated, e.g. Miku, dance, cover)" />
+                    </div>
+                    <div class="upload-row">
+                        <input id="uploadFile" type="file" accept="video/*" />
+                    </div>
+                    <div class="upload-row" style="justify-content:space-between;">
+                        <div style="font-size:10px;color:var(--muted);">
+                            Only local for now. Real hosting will use a backend later.
+                        </div>
+                        <button id="uploadSubmit">Add to MikuVids</button>
+                    </div>
+                </div>
+
+                <div class="top39-banner">
+                    <span>How it works:</span> videos are ranked by views and watch time. Top 39 get a badge.
+                    On <span>3/9</span>, special Miku Day badges appear.
+                </div>
+            </aside>
+        </section>
+    </main>
+
+<script>
+(function() {
+    const isMikuDay = (() => {
+        const now = new Date();
+        return (now.getMonth() === 2 && now.getDate() === 9); // March is 2
+    })();
+
+    if (isMikuDay) {
+        document.body.classList.add("miku-day");
+        const mainText = document.getElementById("mikuMainText");
+        const subText = document.getElementById("mikuSubText");
+        if (mainText && subText) {
+            mainText.textContent = "Happy Miku Day! 🌸";
+            subText.textContent = "Watch and upload Miku content. Special 3/9 badges are active today.";
+        }
+    }
+
+    const STORAGE_KEY = "mikuvids_videos_v1";
+
+    let videos = loadVideos();
+    let currentVideoId = null;
+
+    const videoGrid = document.getElementById("videoGrid");
+    const emptyState = document.getElementById("emptyState");
+    const player = document.getElementById("player");
+    const playerTitle = document.getElementById("playerTitle");
+    const playerMeta = document.getElementById("playerMeta");
+    const playerTags = document.getElementById("playerTags");
+    const mikuStatVideos = document.getElementById("mikuStatVideos");
+    const mikuStatBadges = document.getElementById("mikuStatBadges");
+    const searchInput = document.getElementById("searchInput");
+    const filterCategory = document.getElementById("filterCategory");
+    const openUpload = document.getElementById("openUpload");
+    const uploadPanel = document.getElementById("uploadPanel");
+    const uploadTitle = document.getElementById("uploadTitle");
+    const uploadCategory = document.getElementById("uploadCategory");
+    const uploadTags = document.getElementById("uploadTags");
+    const uploadFile = document.getElementById("uploadFile");
+    const uploadSubmit = document.getElementById("uploadSubmit");
+
+    function loadVideos() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return [];
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            console.warn("Failed to load videos", e);
+            return [];
+        }
+    }
+
+    function saveVideos() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+        } catch (e) {
+            console.warn("Failed to save videos", e);
+        }
+    }
+
+    function generateId() {
+        return "vid_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+
+    function computeRanking() {
+        const scored = videos.map(v => {
+            const score = (v.views || 0) + (v.watchTime || 0) * 0.1;
+            return { id: v.id, score };
+        });
+        scored.sort((a, b) => b.score - a.score);
+        const top39 = scored.slice(0, 39).map(s => s.id);
+        return new Set(top39);
+    }
+
+    function computeBadges() {
+        const top39 = computeRanking();
+        const badges = {};
+        let count = 0;
+        for (const v of videos) {
+            if (top39.has(v.id)) {
+                let type = "daily";
+                if ((v.views || 0) > 50) type = "weekly";
+                if ((v.views || 0) > 150) type = "monthly";
+                if ((v.views || 0) > 400) type = "legend";
+             <!-- HEADER + SEARCH + BUTTONS -->
+<style>
+    #miku-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #39c5bb;
+        padding: 10px 20px;
+        color: white;
+        font-family: "Segoe UI", sans-serif;
+    }
+
+    #miku-logo {
+        font-size: 26px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    #miku-search {
+        width: 350px;
+        padding: 8px 12px;
+        border-radius: 20px;
+        border: none;
+        outline: none;
+        font-size: 15px;
+    }
+
+    #miku-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .miku-btn {
+        background: white;
+        color: #39c5bb;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .miku-btn:hover {
+        background: #e0ffff;
+    }
+
+    /* Video Grid */
+    #video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .video-card {
+        background: #f8ffff;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+
+    .video-title {
+        font-weight: bold;
+        margin-top: 6px;
+    }
+</style>
+
+<div id="miku-header">
+    <div id="miku-logo">MikuVids</div>
+
+    <input id="miku-search" type="text" placeholder="Search MMD, Vocaloid, UTAU…">
+
+    <div id="miku-buttons">
+        <button class="miku-btn" onclick="goHome()">Home</button>
+        <button class="miku-btn" onclick="openTop39()">Top 39</button>
+        <button class="miku-btn" onclick="openUpload()">Upload</button>
+        <button class="miku-btn" onclick="openProfile()">Profile</button>
+    </div>
+</div>
+
+<!-- VIDEO GRID -->
+<div id="video-grid"></div>
+
+<script>
+    // Example video data (replace with real backend later)
+    const videos = [
+        { title: "Miku - World is Mine (MMD)", tags: "mmd vocaloid miku", creator: "HatsuneStudio" },
+        { title: "Kasane Teto - Kasane Territory", tags: "utau teto", creator: "UTAUWorks" },
+        { title: "Gumi - Echo Cover", tags: "vocaloid gumi cover", creator: "GreenVoice" },
+        { title: "Miku x Luka - Magnet", tags: "mmd vocaloid duet", creator: "TwinCreators" }
+    ];
+
+    const grid = document.getElementById("video-grid");
+
+    function renderVideos(list) {
+        grid.innerHTML = "";
+        list.forEach(v => {
+            grid.innerHTML += `
+                <div class="video-card">
+                    <div class="video-thumb"></div>
+                    <div class="video-title">${v.title}</div>
+                    <div class="video-meta">${v.creator}</div>
+                </div>
+            `;
+        });
+    }
+
+    renderVideos(videos);
+
+    // REAL SEARCH BAR
+    document.getElementById("miku-search").addEventListener("input", function () {
+        const q = this.value.toLowerCase();
+        const filtered = videos.filter(v =>
+            v.title.toLowerCase().includes(q) ||
+            v.tags.toLowerCase().includes(q) ||
+            v.creator.toLowerCase().includes(q)
+        );
+        renderVideos(filtered);
+    });
+
+    // BUTTON FUNCTIONS
+    function goHome() {
+        renderVideos(videos);
+    }
+
+    function openTop39() {
+        alert("Top 39 page coming soon!");
+    }
+
+    function openUpload() {
+        alert("Upload page coming soon!");
+    }
+
+    function openProfile() {
+        alert("Profile page coming soon!");
+    }
+</script>
+                               <div id="miku-header">
+    <div id="miku-logo">MikuVids</div>
+
+    <input id="miku-search" type="text" placeholder="Search MMD, Vocaloid, UTAU…">
+
+    <div id="miku-buttons">
+        <button class="miku-btn" onclick="goHome()">Home</button>
+        <button class="miku-btn" onclick="openTop39()">Top 39</button>
+        <button class="miku-btn" onclick="openUpload()">Upload</button>
+        <button class="miku-btn" onclick="openProfile()">Profile</button>
+    </div>
+</div>
+
+<div id="video-grid"></div>
