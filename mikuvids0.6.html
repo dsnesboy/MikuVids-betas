@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MikuVids 2005</title>
+<style>
+    body {
+        margin:0;
+        font-family:Arial, Helvetica, sans-serif;
+        background:#e9e9e9;
+    }
+    /* TOP BAR */
+    #topbar {
+        background:#ffffff;
+        border-bottom:2px solid #cccccc;
+        padding:8px 12px;
+        display:flex;
+        align-items:center;
+        gap:20px;
+    }
+    #logo {
+        font-size:26px;
+        font-weight:bold;
+        color:#cc0000;
+    }
+    #search-box {
+        flex:1;
+        display:flex;
+        gap:4px;
+    }
+    #search-input {
+        width:100%;
+        padding:4px;
+        border:1px solid #999999;
+        font-size:13px;
+    }
+    #search-btn {
+        padding:4px 10px;
+        background:#dddddd;
+        border:1px solid #999999;
+        font-size:12px;
+        cursor:pointer;
+    }
+    /* BUTTON BAR */
+    #button-bar {
+        background:#f2f2f2;
+        border-bottom:1px solid #cccccc;
+        padding:6px 10px;
+        display:flex;
+        gap:12px;
+        font-size:13px;
+    }
+    .yt-btn {
+        cursor:pointer;
+        color:#0033cc;
+        text-decoration:underline;
+    }
+    /* LAYOUT */
+    #layout {
+        display:flex;
+    }
+    /* SIDEBAR */
+    #sidebar {
+        width:180px;
+        background:#ffffff;
+        border-right:1px solid #cccccc;
+        padding:8px;
+        font-size:12px;
+    }
+    .side-btn {
+        display:block;
+        padding:5px;
+        margin-bottom:5px;
+        background:#f7f7f7;
+        border:1px solid #cccccc;
+        cursor:pointer;
+        text-align:center;
+    }
+    /* CONTENT */
+    #content {
+        flex:1;
+        padding:12px;
+        font-size:13px;
+    }
+    #video-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+        gap:12px;
+    }
+    .video-card {
+        background:#ffffff;
+        border:1px solid #cccccc;
+        padding:8px;
+        cursor:pointer;
+    }
+    .video-title {
+        font-size:13px;
+        font-weight:bold;
+        margin-bottom:4px;
+    }
+    .video-meta {
+        font-size:11px;
+        color:#555555;
+    }
+    .rank-card {
+        background:#ffffff;
+        border:1px solid #cccccc;
+        padding:8px;
+        margin-bottom:8px;
+    }
+    .badge {
+        display:inline-block;
+        padding:3px 8px;
+        background:#ffeb99;
+        border:1px solid #cc9900;
+        margin-right:4px;
+        margin-bottom:4px;
+        font-size:11px;
+    }
+    #profile-header {
+        display:flex;
+        align-items:center;
+        gap:10px;
+    }
+    #profile-img {
+        width:64px;
+        height:64px;
+        border-radius:4px;
+        border:1px solid #cccccc;
+        object-fit:cover;
+        background:#dddddd;
+    }
+    table.studio-table {
+        width:100%;
+        border-collapse:collapse;
+        background:#ffffff;
+        font-size:12px;
+    }
+    table.studio-table th,
+    table.studio-table td {
+        border:1px solid #cccccc;
+        padding:4px;
+    }
+    table.studio-table th {
+        background:#f2f2f2;
+    }
+    /* WATCH PAGE */
+    #watch-layout {
+        display:flex;
+        gap:12px;
+    }
+    #watch-main {
+        flex:2;
+    }
+    #watch-side {
+        flex:1;
+    }
+    #watch-video {
+        width:100%;
+        background:#000000;
+    }
+    #watch-title {
+        font-size:16px;
+        font-weight:bold;
+        margin:6px 0;
+    }
+    #watch-meta {
+        font-size:11px;
+        color:#555555;
+        margin-bottom:6px;
+    }
+    #watch-desc {
+        font-size:12px;
+        margin-top:6px;
+    }
+    #comment-list {
+        margin-top:8px;
+    }
+    .comment-item {
+        border-top:1px solid #dddddd;
+        padding:4px 0;
+        font-size:12px;
+    }
+    .small-btn {
+        padding:3px 6px;
+        font-size:11px;
+        cursor:pointer;
+        border:1px solid #999999;
+        background:#f2f2f2;
+        margin-right:4px;
+    }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+    <div id="logo">MikuVids</div>
+    <div id="search-box">
+        <input id="search-input" type="text" placeholder="Search videos...">
+        <button id="search-btn">Search</button>
+    </div>
+</div>
+
+<div id="button-bar">
+    <div class="yt-btn" onclick="goHome()">Home</div>
+    <div class="yt-btn" onclick="filterCategory('mmd')">MMD</div>
+    <div class="yt-btn" onclick="filterCategory('vocaloid')">Vocaloid</div>
+    <div class="yt-btn" onclick="filterCategory('utau')">UTAU</div>
+    <div class="yt-btn" onclick="showTop39()">Top 39</div>
+    <div class="yt-btn" onclick="showUpload()">Upload</div>
+    <div class="yt-btn" onclick="showProfile()">Profile</div>
+    <div class="yt-btn" onclick="showStudio()">MikuVids Studio</div>
+</div>
+
+<div id="layout">
+    <div id="sidebar">
+        <div class="side-btn" onclick="goHome()">Home</div>
+        <div class="side-btn" onclick="filterCategory('mmd')">MMD Videos</div>
+        <div class="side-btn" onclick="filterCategory('vocaloid')">Vocaloid Songs</div>
+        <div class="side-btn" onclick="filterCategory('utau')">UTAU Covers</div>
+        <div class="side-btn" onclick="showTop39()">Top 39</div>
+        <div class="side-btn" onclick="showUpload()">Upload</div>
+        <div class="side-btn" onclick="showProfile()">Profile</div>
+        <div class="side-btn" onclick="showStudio()">MikuVids Studio</div>
+    </div>
+    <div id="content">
+        <div id="video-grid"></div>
+    </div>
+</div>
+
+<script>
+/* ---------- STORAGE HELPERS ---------- */
+function loadJSON(key, fallback) {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    try { return JSON.parse(raw); } catch(e) { return fallback; }
+}
+function saveJSON(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+/* ---------- GLOBAL DATA ---------- */
+let uploads = loadJSON("mikuvidsUploads", []);
+let profile = loadJSON("mikuvidsProfile", null);
+let flags = loadJSON("mikuvidsFlags", {});
+let creators = loadJSON("mikuvidsCreators", {}); // channelName -> {bytescribers}
+let comments = loadJSON("mikuvidsComments", {}); // videoId -> [{author,text,ts}]
+let likes = loadJSON("mikuvidsLikes", {}); // videoId -> {count, likedBy:[usernames]}
+
+/* ---------- INITIAL SEED ---------- */
+if (uploads.length === 0) {
+    uploads = [
+        {
+            id:1,
+            title:"Miku - World is Mine (MMD)",
+            url:"",
+            isFile:false,
+            desc:"Classic Miku performance.",
+            category:"mmd",
+            channelName:"HatsuneStudio",
+            views:12000,
+            created:Date.now()-86400000
+        },
+        {
+            id:2,
+            title:"Kasane Teto - Kasane Territory",
+            url:"",
+            isFile:false,
+            desc:"UTAU classic.",
+            category:"utau",
+            channelName:"UTAUWorks",
+            views:5400,
+            created:Date.now()-43200000
+        },
+        {
+            id:3,
+            title:"Gumi - Echo Cover",
+            url:"",
+            isFile:false,
+            desc:"Vocaloid cover.",
+            category:"vocaloid",
+            channelName:"GreenVoice",
+            views:8000,
+            created:Date.now()-20000000
+        },
+        {
+            id:4,
+            title:"Miku x Luka - Magnet",
+            url:"",
+            isFile:false,
+            desc:"Duet.",
+            category:"mmd",
+            channelName:"TwinCreators",
+            views:9500,
+            created:Date.now()-10000000
+        }
+    ];
+    saveJSON("mikuvidsUploads", uploads);
+}
+if (!flags) flags = {};
+if (!creators) creators = {};
+if (!comments) comments = {};
+if (!likes) likes = {};
+
+/* Ensure creators exist for seeded uploads */
+uploads.forEach(v=>{
+    if (!creators[v.channelName]) {
+        creators[v.channelName] = { bytescribers:0 };
+    }
+});
+saveJSON("mikuvidsCreators", creators);
+
+/* ---------- BADGES ---------- */
+function computeBadges() {
+    const badges = [];
+    if (!profile) return badges;
+
+    const myUploads = uploads.filter(u => u.channelName === profile.channelName);
+    const uploadCount = myUploads.length;
+
+    if (uploadCount >= 1) badges.push("First Upload");
+    if (uploadCount >= 3) badges.push("Uploader Lv.2");
+    if (flags.studioOpened) badges.push("Studio User");
+
+    const today = new Date();
+    if (today.getMonth() === 2 && today.getDate() === 9) {
+        badges.push("Miku Day 3/9");
+    }
+
+    const top39Ids = getTop39Ids();
+    const hasTop = myUploads.some(u => top39Ids.includes(u.id));
+    if (hasTop) badges.push("Top 39 Winner");
+
+    const creatorInfo = creators[profile.channelName] || {bytescribers:0};
+    const subs = creatorInfo.bytescribers || 0;
+    if (subs >= 10) badges.push("Rising Creator");
+    if (subs >= 39) badges.push("39 Club");
+    if (subs >= 100) badges.push("Viral Creator");
+
+    return badges;
+}
+
+function getTop39Ids() {
+    const sorted = [...uploads].sort((a,b)=>b.views - a.views);
+    return sorted.slice(0,39).map(u=>u.id);
+}
+
+/* ---------- RENDER HOME ---------- */
+const grid = document.getElementById("video-grid");
+
+function renderVideos(list) {
+    grid.innerHTML = "";
+    if (list.length === 0) {
+        grid.innerHTML = "<p>No videos found.</p>";
+        return;
+    }
+    list.forEach(v => {
+        grid.innerHTML += `
+            <div class="video-card" onclick="openWatch(${v.id})">
+                <div class="video-title">${v.title}</div>
+                <div class="video-meta">${v.channelName || "Unknown"} – ${v.views} views</div>
+            </div>
+        `;
+    });
+}
+
+function showHome() {
+    renderVideos(uploads);
+}
+function goHome() {
+    showHome();
+}
+
+/* ---------- SEARCH ---------- */
+document.getElementById("search-btn").onclick = function() {
+    const q = document.getElementById("search-input").value.toLowerCase();
+    const filtered = uploads.filter(v =>
+        v.title.toLowerCase().includes(q) ||
+        v.desc.toLowerCase().includes(q) ||
+        (v.channelName || "").toLowerCase().includes(q)
+    );
+    renderVideos(filtered);
+};
+
+/* ---------- CATEGORY FILTER ---------- */
+function filterCategory(cat) {
+    const filtered = uploads.filter(v => v.category === cat);
+    renderVideos(filtered);
+}
+
+/* ---------- TOP 39 ---------- */
+function showTop39() {
+    const sorted = [...uploads].sort((a,b)=>b.views - a.views).slice(0,39);
+    grid.innerHTML = "<h2>Today's Top 39 Videos</h2>";
+    sorted.forEach((v,i)=>{
+        grid.innerHTML += `
+            <div class="rank-card">
+                <b>#${i+1}</b> ${v.title}<br>
+                <span class="video-meta">${v.channelName || "Unknown"} – ${v.views} views</span>
+            </div>
+        `;
+    });
+}
+
+/* ---------- PROFILE CREATION / VIEW ---------- */
+function showProfile() {
+    if (!profile) {
+        showProfileCreation(false);
+        return;
+    }
+
+    const badges = computeBadges();
+    const creatorInfo = creators[profile.channelName

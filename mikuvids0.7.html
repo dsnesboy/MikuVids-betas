@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MikuVids 2005</title>
+    <style>
+        /* ===== GLOBAL RESET ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #e9e9e9;
+            color: #000;
+        }
+
+        a {
+            color: #0033cc;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        input, textarea, select {
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        /* ===== LAYOUT ===== */
+        #wrapper {
+            width: 960px;
+            margin: 20px auto;
+        }
+
+        #header {
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #cc0000;
+        }
+
+        #logo span {
+            color: #000000;
+            font-weight: normal;
+        }
+
+        #search-bar {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        #search-input {
+            width: 260px;
+            padding: 3px;
+            border: 1px solid #999;
+        }
+
+        #search-button {
+            padding: 3px 8px;
+            font-size: 12px;
+            border: 1px solid #999;
+            background: #f2f2f2;
+        }
+
+        #top-links {
+            font-size: 11px;
+        }
+
+        #top-links a {
+            margin-left: 8px;
+        }
+
+        #main {
+            margin-top: 8px;
+            display: flex;
+        }
+
+        /* ===== SIDEBAR ===== */
+        #sidebar-container {
+            position: relative;
+            width: 180px;
+            margin-right: 8px;
+        }
+
+        #sidebar {
+            width: 180px;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            padding: 8px;
+            font-size: 12px;
+            position: relative;
+            transform: translateX(0);
+            transition: transform 150ms linear;
+            z-index: 5;
+        }
+
+        #sidebar.collapsed {
+            transform: translateX(-180px);
+        }
+
+        #sidebar h3 {
+            font-size: 12px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 3px;
+        }
+
+        #sidebar ul {
+            list-style: none;
+            margin-top: 4px;
+        }
+
+        #sidebar li {
+            margin: 3px 0;
+        }
+
+        #sidebar li a {
+            font-size: 12px;
+        }
+
+        #sidebar .section {
+            margin-bottom: 10px;
+        }
+
+        /* ===== MIKU TOGGLE BUTTON ===== */
+        #miku-toggle {
+            position: absolute;
+            top: 10px;
+            left: 182px; /* sits just to the right of sidebar edge */
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #39c5bb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 4px rgba(0,0,0,0.4);
+            cursor: pointer;
+            z-index: 10;
+            transition: box-shadow 150ms linear, transform 150ms linear;
+        }
+
+        #miku-toggle:hover {
+            box-shadow: 0 0 8px rgba(0,0,0,0.6);
+            transform: scale(1.05);
+        }
+
+        #miku-toggle svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+        }
+
+        /* ===== CONTENT AREA ===== */
+        #content {
+            flex: 1;
+        }
+
+        #page {
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            padding: 10px;
+            min-height: 400px;
+            font-size: 13px;
+        }
+
+        /* ===== HOME / VIDEO GRID ===== */
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 4px;
+        }
+
+        #category-bar {
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        #category-bar button {
+            margin-right: 4px;
+            margin-bottom: 4px;
+            padding: 2px 6px;
+            border: 1px solid #999;
+            background: #f2f2f2;
+            font-size: 11px;
+        }
+
+        #video-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .video-card {
+            width: 180px;
+            border: 1px solid #ddd;
+            padding: 4px;
+            background: #fafafa;
+            cursor: pointer;
+        }
+
+        .video-thumb {
+            width: 100%;
+            height: 100px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .video-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .video-meta {
+            font-size: 11px;
+            color: #555;
+        }
+
+        /* ===== WATCH PAGE ===== */
+        #watch-layout {
+            display: flex;
+            gap: 10px;
+        }
+
+        #watch-main {
+            flex: 2;
+        }
+
+        #watch-side {
+            flex: 1;
+            font-size: 12px;
+        }
+
+        #watch-video {
+            width: 100%;
+            max-height: 360px;
+            background: #000;
+            margin-bottom: 6px;
+        }
+
+        #watch-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        #watch-meta {
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        #watch-description {
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        #watch-actions {
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        #watch-actions button {
+            margin-right: 4px;
+            padding: 2px 6px;
+            border: 1px solid #999;
+            background: #f2f2f2;
+            font-size: 11px;
+        }
+
+        #comments {
+            margin-top: 10px;
+        }
+
+        #comments h4 {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .comment {
+            border-top: 1px solid #eee;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .comment-text {
+            font-size: 12px;
+        }
+
+        #comment-form {
+            margin-top: 6px;
+        }
+
+        #comment-form input,
+        #comment-form textarea {
+            width: 100%;
+            margin-bottom: 4px;
+            padding: 3px;
+            border: 1px solid #ccc;
+        }
+
+        #comment-form button {
+            padding: 2px 6px;
+            border: 1px solid #999;
+            background: #f2f2f2;
+            font-size: 11px;
+        }
+
+        /* ===== UPLOAD PAGE ===== */
+        .form-row {
+            margin-bottom: 6px;
+        }
+
+        .form-row label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .form-row input[type="text"],
+        .form-row textarea {
+            width: 100%;
+            padding: 3px;
+            border: 1px solid #ccc;
+        }
+
+        .form-row input[type="file"] {
+            font-size: 12px;
+        }
+
+        .form-row textarea {
+            height: 60px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            margin-top: 8px;
+        }
+
+        .form-actions button {
+            padding: 3px 8px;
+            border: 1px solid #999;
+            background: #f2f2f2;
+            font-size: 12px;
+        }
+
+        /* ===== PROFILE / STUDIO / TOP 39 ===== */
+        .profile-section,
+        .studio-section,
+        .top39-section,
+        .bytescribe-section {
+            margin-bottom: 10px;
+        }
+
+        .profile-label {
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .studio-list,
+        .top39-list {
+            margin-top: 6px;
+            font-size: 12px;
+        }
+
+        .studio-item,
+        .top39-item {
+            border-top: 1px solid #eee;
+            padding: 4px 0;
+        }
+
+        .studio-item-title,
+        .top39-item-title {
+            font-weight: bold;
+        }
+
+        .studio-item-meta,
+        .top39-item-meta {
+            font-size: 11px;
+            color: #555;
+        }
+
+        /* ===== FOOTER ===== */
+        #footer {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="header">
+            <div id="logo">
+                Miku<span>Vids</span> <span style="font-size:12px;color:#666;">2005</span>
+            </div>
+            <div id="search-bar">
+                <input id="search-input" type="text" placeholder="Search videos">
+                <button id="search-button">Search</button>
+            </div>
+            <div id="top-links">
+                <a href="javascript:void(0)" id="link-home">Home</a>
+                <a href="javascript:void(0)" id="link-upload">Upload</a>
+                <a href="javascript:void(0)" id="link-profile">Profile</a>
+                <a href="javascript:void(0)" id="link-studio">Studio</a>
+                <a href="javascript:void(0)" id="link-top39">Top 39</a>
+            </div>
+        </div>
+
+        <div id="main">
+            <div id="sidebar-container">
+                <div id="sidebar">
+                    <div class="section">
+                        <h3>Browse</h3>
+                        <ul>
+                            <li><a href="javascript:void(0)" id="nav-home">Home</a></li>
+                            <li><a href="javascript:void(0)" id="nav-mmd">MMD Videos</a></li>
+                            <li><a href="javascript:void(0)" id="nav-vocaloid">Vocaloid Songs</a></li>
+                            <li><a href="javascript:void(0)" id="nav-utau">UTAU Covers</a></li>
+                            <li><a href="javascript:void(0)" id="nav-top39">Top 39</a></li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <h3>Creator</h3>
+                        <ul>
+                            <li><a href="javascript:void(0)" id="nav-upload">Upload</a></li>
+                            <li><a href="javascript:void(0)" id="nav-studio">Studio</a></li>
+                            <li><a href="javascript:void(0)" id="nav-bytescribe">Bytescribe</a></li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <h3>Account</h3>
+                        <ul>
+                            <li><a href="javascript:void(0)" id="nav-profile">Profile</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Miku head toggle button -->
+                <div id="miku-toggle" title="Toggle MikuVids menu">
+                    <!-- Simple side-view Miku head silhouette (solid black) -->
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <!-- Head -->
+                        <circle cx="11" cy="10" r="4" fill="#000000"></circle>
+                        <!-- Hair / twin-tail block (side-view, simple) -->
+                        <rect x="13.5" y="8" width="5" height="8" rx="1" ry="1" fill="#000000"></rect>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="content">
+                <div id="page">
+                    <!-- Initial content will be injected by JS (home page) -->
+                    Loading MikuVids 2005...
+                </div>
+            </div>
+        </div>
+
+        <div id="footer">
+            MikuVids 2005 &mdash; a nostalgic Vocaloid video sharing experience. Not affiliated with YouTube or Crypton Future Media.
+        </div>
+    </div>
+
+    <script>
+        // ===== CORE STATE & STORAGE =====
+        const page = document.getElementById('page');
+        const sidebar = document.getElementById('sidebar');
+        const mikuToggle = document.getElementById('miku-toggle');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+
+        // Navigation links
+        const linkHome = document.getElementById('link-home');
+        const linkUpload = document.getElementById('link-upload');
+        const linkProfile = document.getElementById('link-profile');
+        const linkStudio = document.getElementById('link-studio');
+        const linkTop39 = document.getElementById('link-top39');
+
+        const navHome = document.getElementById('nav-home');
+        const navMMD = document.getElementById('nav-mmd');
+        const navVocaloid = document.getElementById('nav-vocaloid');
+        const navUTAU = document.getElementById('nav-utau');
+        const navTop39 = document.getElementById('nav-top39');
+        const navUpload = document.getElementById('nav-upload');
+        const navStudio = document.getElementById('nav-studio');
+        const navBytescribe = document.getElementById('nav-bytescribe');
+        const navProfile = document.getElementById('nav-profile');
+
+        // LocalStorage keys
+        const LS_KEY_VIDEOS = 'mikuvids_videos';
+        const LS_KEY_PROFILE = 'mikuvids_profile';
+        const LS_KEY_BYTESCRIBE = 'mikuvids_bytescribe';
+
+        // In-memory state
+        let videos = [];
+        let profile = {
+            username: 'MikuFan',
+            channelName: 'Hatsune Miku Channel',
+            avatarUrl: ''
+        };
+        let bytescribeCount = 0;
+        let currentCategory = 'all'; // all, mmd, vocaloid, utau
+        let currentSearch = '';
+        let currentVideoId = null;
+
+        // ===== UTILITIES =====
+        function loadState() {
+            try {
+                const v = localStorage.getItem(LS_KEY_VIDEOS);
+                if (v) videos = JSON.parse(v);
+            } catch (e) {
+                videos = [];
+            }
+
+            try {
+                const p = localStorage.getItem(LS_KEY_PROFILE);
+                if (p) profile = JSON.parse(p);
+            } catch (e) {
+                // keep default
+            }
+
+            try {
+                const b = localStorage.getItem(LS_KEY_BYTESCRIBE);
+                if (b) bytescribeCount = parseInt(b, 10) || 0;
+            } catch (e) {
+                bytescribeCount = 0;
+            }
+        }
+
+        function saveVideos() {
+            localStorage.setItem(LS_KEY_VIDEOS, JSON.stringify(videos));
+        }
+
+        function saveProfile() {
+            localStorage.setItem(LS_KEY_PROFILE, JSON.stringify(profile));
+        }
+
+        function saveBytescribe() {
+            localStorage.setItem(LS_KEY_BYTESCRIBE, String(bytescribeCount));
+        }
+
+        function generateMVID() {
+            const base = 'MV-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+            const time = Date.now().toString(36).toUpperCase();
+            return base + '-' + time;
+        }
+
+        function formatDate(ts) {
+            const d = new Date(ts);
+            return d.toLocaleDateString();
+        }
+
+        function escapeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function filterVideos() {
+            return videos.filter(v => {
+                if (currentCategory !== 'all' && v.category !== currentCategory) return false;
+                if (currentSearch) {
+                    const q = currentSearch.toLowerCase();
+                    if (!v.title.toLowerCase().includes(q) &&
+                            !v.description.toLowerCase().includes(q)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+
+        function getVideoById(id) {
+            return videos.find(v => v.id === id) || null;
+        }
+
+        function incrementView(id) {
+            const v = getVideoById(id);
+            if (v) {
+                v.views = (v.views || 0) + 1;
+                saveVideos();
+            }
+        }
+
+        function incrementLike(id) {
+            const v = getVideoById(id);
+            if (v) {
+                v.likes = (v.likes || 0) + 1;
+                saveVideos();
+            }
+        }
+
+        function addComment(id, author, text) {
+            const v = getVideoById(id);
+            if (v) {
+                if (!Array.isArray(v.comments)) v.comments = [];
+                v.comments.push({
+                    author: author || 'Anonymous',
+                    text: text || '',
+                    ts: Date.now()
+                });
+                saveVideos();
+            }
+        }
+
+        function ensureDemoVideos() {
+            if (videos.length > 0) return;
+            const now = Date.now();
+            videos = [
+                {
+                    id: generateMVID(),
+                    title: 'World is Mine (MMD)',
+                    description: 'Classic Miku performance in MMD.',
+                    category: 'mmd',
+                    uploader: 'MikuWorld',
+                    mvId: generateMVID(),
+                    url: '',
+                    isFile: false,
+                    created: now - 86400000 * 5,
+                    views: 1234,
+                    likes: 256,
+                    comments: [
+                        { author: 'LenFan', text: 'This is so nostalgic!', ts: now - 86400000 * 4 },
+                        { author: 'RinRin', text: 'Miku forever!', ts: now - 86400000 * 3 }
+                    ]
+                },
+                {
+                    id: generateMVID(),
+                    title: 'Melt - Hatsune Miku',
+                    description: 'Vocaloid classic.',
+                    category: 'vocaloid',
+                    uploader: 'VocaloidLover',
+                    mvId: generateMVID(),
+                    url: 'https://example.com/melt',
+                    isFile: false,
+                    created: now - 86400000 * 10,
+                    views: 4321,
+                    likes: 512,
+                    comments: []
+                },
+                {
+                    id: generateMVID(),
+                    title: 'Kokoro - UTAU Cover',
+                    description: 'UTAU cover with Teto.',
+                    category: 'utau',
+                    uploader: 'TetoTime',
+                    mvId: generateMVID(),
+                    url: 'https://example.com/kokoro',
+                    isFile: false,
+                    created: now - 86400000 * 2,
+                    views: 789,
+                    likes: 120,
+                    comments: []
+                }
+            ];
+            saveVideos();
+        }
+
+        // ===== SIDEBAR TOGGLE =====
+        function setSidebarCollapsed(collapsed) {
+            if (collapsed) {
+                sidebar.classList.add('collapsed');
+            } else {
+                sidebar.classList.remove('collapsed');
+            }
+        }
+
+        mikuToggle.addEventListener('click', () => {
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            setSidebarCollapsed(!isCollapsed);
+        });
+
+        // ===== PAGE RENDERERS (DECLARED, IMPLEMENTED LATER) =====
+        function renderHome() {}
+        function renderUpload() {}
+        function renderProfile() {}
+        function renderStudio() {}
+        function renderTop39() {}
+        function renderBytescribe() {}
+        function renderWatch(videoId) {}
+        function renderSearchResults() {}
+
+        // ===== INITIALIZE STATE =====
+        loadState();
+        ensureDemoVideos();
+    </script>
+      <script>
+/* ===== PAGE RENDERERS ===== */
+
+function renderHome() {
+    setSidebarCollapsed(false);
+    const list = filterVideos();
+    let html = `
+        <div class="section-title">Featured Videos</div>
+        <div id="category-bar">
+            <button onclick="setCategory('all')">All</button>
+            <button onclick="setCategory('mmd')">MMD</button>
+            <button onclick="setCategory('vocaloid')">Vocaloid</button>
+            <button onclick="setCategory('utau')">UTAU</button>
+        </div>
+        <div id="video-grid">
+    `;
+    for (const v of list) {
+        html += `
+            <div class="video-card" onclick="renderWatch('${v.id}')">
+                <div class="video-thumb">${v.isFile ? 'Uploaded Video' : 'External Link'}</div>
+                <div class="video-title">${escapeHTML(v.title)}</div>
+                <div class="video-meta">${v.views || 0} views</div>
+            </div>
+        `;
+    }
+    html += `</div>`;
+    page.innerHTML = html;
+}
+
+function setCategory(cat) {
+    currentCategory = cat;
+    renderHome();
+}
+
+function renderUpload() {
+    setSidebarCollapsed(false);
+    page.innerHTML = `
+        <div class="section-title">Upload Video</div>
+        <div class="form-row">
+            <label>Title</label>
+            <input id="up-title" type="text">
+        </div>
+        <div class="form-row">
+            <label>Description</label>
+            <textarea id="up-desc"></textarea>
+        </div>
+        <div class="form-row">
+            <label>Category</label>
+            <select id="up-cat">
+                <option value="mmd">MMD</option>
+                <option value="vocaloid">Vocaloid</option>
+                <option value="utau">UTAU</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label>Upload File (optional)</label>
+            <input id="up-file" type="file" accept="video/*">
+        </div>
+        <div class="form-row">
+            <label>Or External URL</label>
+            <input id="up-url" type="text" placeholder="https://...">
+        </div>
+        <div class="form-actions">
+            <button onclick="submitUpload()">Submit</button>
+        </div>
+    `;
+}
+
+function submitUpload() {
+    const title = document.getElementById('up-title').value.trim();
+    const desc = document.getElementById('up-desc').value.trim();
+    const cat = document.getElementById('up-cat').value;
+    const file = document.getElementById('up-file').files[0];
+    const url = document.getElementById('up-url').value.trim();
+
+    if (!title) {
+        alert("Title required.");
+        return;
+    }
+
+    if (!file && !url) {
+        alert("Upload a file or enter a URL.");
+        return;
+    }
+
+    const id = generateMVID();
+    const now = Date.now();
+    const video = {
+        id,
+        title,
+        description: desc,
+        category: cat,
+        uploader: profile.channelName,
+        mvId: generateMVID(),
+        created: now,
+        views: 0,
+        likes: 0,
+        comments: []
+    };
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            video.url = reader.result;
+            video.isFile = true;
+            videos.push(video);
+            saveVideos();
+            renderWatch(id);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        video.url = url;
+        video.isFile = false;
+        videos.push(video);
+        saveVideos();
+        renderWatch(id);
+    }
+}
+
+function renderProfile() {
+    setSidebarCollapsed(false);
+    page.innerHTML = `
+        <div class="section-title">Profile</div>
+        <div class="profile-section">
+            <div class="profile-label">Username:</div>
+            <input id="prof-username" type="text" value="${escapeHTML(profile.username)}">
+        </div>
+        <div class="profile-section">
+            <div class="profile-label">Channel Name:</div>
+            <input id="prof-channel" type="text" value="${escapeHTML(profile.channelName)}">
+        </div>
+        <div class="profile-section">
+            <div class="profile-label">Avatar URL (optional):</div>
+            <input id="prof-avatar" type="text" value="${escapeHTML(profile.avatarUrl)}">
+        </div>
+        <div class="form-actions">
+            <button onclick="saveProfileChanges()">Save</button>
+        </div>
+    `;
+}
+
+function saveProfileChanges() {
+    profile.username = document.getElementById('prof-username').value.trim() || 'User';
+    profile.channelName = document.getElementById('prof-channel').value.trim() || 'My Channel';
+    profile.avatarUrl = document.getElementById('prof-avatar').value.trim();
+    saveProfile();
+    alert("Profile saved.");
+    renderProfile();
+}
+
+function renderStudio() {
+    setSidebarCollapsed(false);
+    let html = `
+        <div class="section-title">Studio</div>
+        <div class="studio-section">
+            <div class="studio-list">
+    `;
+    const mine = videos.filter(v => v.uploader === profile.channelName);
+    for (const v of mine) {
+        html += `
+            <div class="studio-item">
+                <div class="studio-item-title">${escapeHTML(v.title)}</div>
+                <div class="studio-item-meta">${v.views} views • ${v.likes} likes</div>
+                <button onclick="renderWatch('${v.id}')">View</button>
+                <button onclick="deleteVideo('${v.id}')">Delete</button>
+            </div>
+        `;
+    }
+    html += `</div></div>`;
+    page.innerHTML = html;
+}
+
+function deleteVideo(id) {
+    if (!confirm("Delete this video?")) return;
+    videos = videos.filter(v => v.id !== id);
+    saveVideos();
+    renderStudio();
+}
+
+function renderTop39() {
+    setSidebarCollapsed(false);
+    const sorted = [...videos].sort((a, b) => (b.likes + b.views) - (a.likes + a.views));
+    let html = `
+        <div class="section-title">Top 39</div>
+        <div class="top39-section">
+            <div class="top39-list">
+    `;
+    let rank = 1;
+    for (const v of sorted.slice(0, 39)) {
+        html += `
+            <div class="top39-item">
+                <div class="top39-item-title">#${rank} — ${escapeHTML(v.title)}</div>
+                <div class="top39-item-meta">${v.views} views • ${v.likes} likes</div>
+                <button onclick="renderWatch('${v.id}')">Watch</button>
+            </div>
+        `;
+        rank++;
+    }
+    html += `</div></div>`;
+    page.innerHTML = html;
+}
+
+function renderBytescribe() {
+    setSidebarCollapsed(false);
+    page.innerHTML = `
+        <div class="section-title">Bytescribe</div>
+        <div class="bytescribe-section">
+            <p>You have <b>${bytescribeCount}</b> Bytescribes.</p>
+            <button onclick="addBytescribe()">Give Bytescribe</button>
+        </div>
+    `;
+}
+
+function addBytescribe() {
+    bytescribeCount++;
+    saveBytescribe();
+    renderBytescribe();
+}
+
+function renderWatch(id) {
+    currentVideoId = id;
+    setSidebarCollapsed(true);
+    incrementView(id);
+    const v = getVideoById(id);
+    if (!v) {
+        page.innerHTML = `<p>Video not found.</p>`;
+        return;
+    }
+
+    let videoHTML = '';
+    if (v.isFile) {
+        videoHTML = `<video id="watch-video" controls src="${v.url}"></video>`;
+    } else {
+        videoHTML = `
+            <div id="watch-video" style="background:#000;color:#fff;display:flex;align-items:center;justify-content:center;">
+                <a href="${v.url}" target="_blank" style="color:#fff;">Open External Video</a>
+            </div>
+        `;
+    }
+
+    let commentsHTML = '';
+    for (const c of v.comments) {
+        commentsHTML += `
+            <div class="comment">
+                <div class="comment-author">${escapeHTML(c.author)}</div>
+                <div class="comment-text">${escapeHTML(c.text)}</div>
+            </div>
+        `;
+    }
+
+    page.innerHTML = `
+        <div id="watch-layout">
+            <div id="watch-main">
+                ${videoHTML}
+                <div id="watch-title">${escapeHTML(v.title)}</div>
+                <div id="watch-meta">${v.views} views • ${v.likes} likes • Uploaded by ${escapeHTML(v.uploader)}</div>
+                <div id="watch-description">${escapeHTML(v.description)}</div>
+                <div id="watch-actions">
+                    <button onclick="likeVideo('${v.id}')">Like</button>
+                    <button onclick="renderHome()">Back</button>
+                </div>
+                <div id="comments">
+                    <h4>Comments</h4>
+                    ${commentsHTML}
+                    <div id="comment-form">
+                        <input id="com-author" type="text" placeholder="Name">
+                        <textarea id="com-text" placeholder="Comment"></textarea>
+                        <button onclick="submitComment('${v.id}')">Post</button>
+                    </div>
+                </div>
+            </div>
+            <div id="watch-side">
+                <div class="section-title">More Videos</div>
+                ${renderWatchSidebarHTML(id)}
+            </div>
+        </div>
+    `;
+}
+
+function renderWatchSidebarHTML(currentId) {
+    let html = '';
+    for (const v of videos) {
+        if (v.id === currentId) continue;
+        html += `
+            <div class="video-card" onclick="renderWatch('${v.id}')">
+                <div class="video-thumb">${v.isFile ? 'Uploaded' : 'External'}</div>
+                <div class="video-title">${escapeHTML(v.title)}</div>
+                <div class="video-meta">${v.views} views</div>
+            </div>
+        `;
+    }
+    return html;
+}
+
+function likeVideo(id) {
+    incrementLike(id);
+    renderWatch(id);
+}
+
+function submitComment(id) {
+    const author = document.getElementById('com-author').value.trim() || 'Anonymous';
+    const text = document.getElementById('com-text').value.trim();
+    if (!text) return;
+    addComment(id, author, text);
+    renderWatch(id);
+}
+
+function renderSearchResults() {
+    setSidebarCollapsed(false);
+    const list = filterVideos();
+    let html = `
+        <div class="section-title">Search Results</div>
+        <div id="video-grid">
+    `;
+    for (const v of list) {
+        html += `
+            <div class="video-card" onclick="renderWatch('${v.id}')">
+                <div class="video-thumb">${v.isFile ? 'Uploaded' : 'External'}</div>
+                <div class="video-title">${escapeHTML(v.title)}</div>
+                <div class="video-meta">${v.views} views</div>
+            </div>
+        `;
+    }
+    html += `</div>`;
+    page.innerHTML = html;
+}
+
+/* ===== EVENT WIRING ===== */
+
+searchButton.addEventListener('click', () => {
+    currentSearch = searchInput.value.trim();
+    renderSearchResults();
+});
+
+linkHome.onclick = navHome.onclick = () => renderHome();
+linkUpload.onclick = navUpload.onclick = () => renderUpload();
+linkProfile.onclick = navProfile.onclick = () => renderProfile();
+linkStudio.onclick = navStudio.onclick = () => renderStudio();
+linkTop39.onclick = navTop39.onclick = () => renderTop39();
+navMMD.onclick = () => { currentCategory = 'mmd'; renderHome(); };
+navVocaloid.onclick = () => { currentCategory = 'vocaloid'; renderHome(); };
+navUTAU.onclick = () => { currentCategory = 'utau'; renderHome(); };
+navBytescribe.onclick = () => renderBytescribe();
+
+/* ===== START APP ===== */
+renderHome();
+</script>
+</body>
+</html>

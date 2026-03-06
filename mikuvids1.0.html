@@ -1,0 +1,527 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MikuVids 2005</title>
+
+<style>
+/* ======== GLOBAL 2005 YOUTUBE STYLE ======== */
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background: #ffffff;
+    font-family: Arial, sans-serif;
+    color: #000;
+}
+
+/* ======== APP WRAPPER ======== */
+#app {
+    width: 1200px;
+    margin: 0 auto;
+    background: #fff;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ======== LOGO (2005 STYLE) ======== */
+#logo {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+#logo .red {
+    color: #cc0000;
+}
+
+#logo .tube {
+    color: #000;
+    background: #fff;
+    padding: 2px 4px;
+    border: 1px solid #999;
+}
+
+/* ======== SIDEBAR ======== */
+#sidebar {
+    width: 180px;
+    background: #f2f2f2;
+    border-right: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: border-box;
+    min-height: 100vh;
+}
+
+#sidebar button {
+    width: 100%;
+    padding: 4px;
+    margin-bottom: 6px;
+    background: #fff;
+    border: 1px solid #999;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* ======== CONTENT AREA ======== */
+#content {
+    flex: 1;
+    padding: 10px;
+    background: #fff;
+    box-sizing: border-box;
+    min-height: 100vh;
+}
+
+#page h2 {
+    font-size: 18px;
+    margin-top: 0;
+}
+
+/* ======== HOME PAGE ======== */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.video-card {
+    border: 1px solid #ccc;
+    background: #fafafa;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.video-thumb {
+    width: 100%;
+    height: 90px;
+    background: #ddd;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-title {
+    font-size: 12px;
+    color: #0033cc;
+    text-decoration: underline;
+    margin-top: 4px;
+}
+
+.video-meta {
+    font-size: 10px;
+    color: #555;
+}
+
+/* ======== SEARCH PAGE ======== */
+#search-bar {
+    margin-bottom: 10px;
+}
+
+#search-bar input {
+    width: 300px;
+    padding: 4px;
+    border: 1px solid #999;
+}
+
+#search-bar button {
+    padding: 4px 8px;
+    border: 1px solid #999;
+    background: #eee;
+    cursor: pointer;
+}
+
+/* ======== WATCH PAGE ======== */
+#watch-wrapper {
+    background: #ffffff;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#watch-layout {
+    display: flex;
+    width: 960px;
+    margin-left: 10px;
+}
+
+#watch-main {
+    width: 640px;
+}
+
+#watch-side {
+    width: 300px;
+    margin-left: 20px;
+}
+
+/* Player */
+#watch-video {
+    width: 640px;
+    height: 360px;
+    background: #000;
+    border: 1px solid #333;
+    margin-bottom: 10px;
+}
+
+/* Title + Meta */
+#watch-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+#watch-meta {
+    font-size: 11px;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+/* Description */
+#watch-description-box {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 6px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+#watch-actions button {
+    background: #fff;
+    border: 1px solid #999;
+    font-size: 11px;
+    padding: 3px 6px;
+    cursor: pointer;
+    margin-right: 4px;
+}
+
+/* Comments */
+#comments {
+    margin-top: 10px;
+}
+
+.comment {
+    border-top: 1px solid #ccc;
+    padding: 6px 0;
+}
+
+.comment-author {
+    font-size: 11px;
+    color: #0033cc;
+}
+
+.comment-text {
+    font-size: 12px;
+}
+
+/* Comment form */
+#comment-form input,
+#comment-form textarea {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #999;
+    margin-bottom: 6px;
+}
+
+#comment-form button {
+    background: #fff;
+    border: 1px solid #999;
+    font-size: 11px;
+    padding: 3px 6px;
+    cursor: pointer;
+}
+
+/* Recommended videos */
+.watch-reco-item {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.watch-reco-thumb {
+    width: 120px;
+    height: 68px;
+    background: #ddd;
+    border: 1px solid #bbb;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+    <div id="sidebar">
+        <h2 id="logo"><span class="red">Miku</span><span class="tube">Vids</span></h2>
+        <button onclick="renderHome()">Home</button>
+        <button onclick="renderSearch()">Search</button>
+    </div>
+
+    <div id="content">
+        <div id="page"></div>
+    </div>
+</div>
+
+<script>
+/* ===== DATA STORAGE ===== */
+let videos = [];
+let currentVideoId = null;
+
+function saveVideos() {
+    localStorage.setItem("mikuvids_videos", JSON.stringify(videos));
+}
+
+function loadVideos() {
+    const d = localStorage.getItem("mikuvids_videos");
+    if (d) videos = JSON.parse(d);
+}
+
+function generateMVID() {
+    return "mv" + Math.random().toString(36).substring(2, 10);
+}
+
+function getVideoById(id) {
+    return videos.find(v => v.id === id);
+}
+
+function escapeHTML(s) {
+    return s.replace(/[&<>"']/g, c => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    }[c]));
+}
+
+function formatDate(t) {
+    return new Date(t).toLocaleDateString();
+}
+
+/* ===== INITIAL DEMO VIDEOS ===== */
+function ensureDemoVideos() {
+    if (videos.length > 0) return;
+    const now = Date.now();
+    videos = [
+        {
+            id: generateMVID(),
+            title: "World is Mine (MMD)",
+            description: "Classic Miku performance in MMD.",
+            uploader: "MikuWorld",
+            url: "",
+            isFile: false,
+            created: now - 86400000 * 5,
+            views: 0,
+            likes: 0,
+            comments: []
+        },
+        {
+            id: generateMVID(),
+            title: "Melt - Hatsune Miku",
+            description: "Vocaloid classic.",
+            uploader: "VocaloidLover",
+            url: "https://example.com/melt",
+            isFile: false,
+            created: now - 86400000 * 10,
+            views: 0,
+            likes: 0,
+            comments: []
+        },
+        {
+            id: generateMVID(),
+            title: "Kokoro - UTAU Cover",
+            description: "UTAU cover with Teto.",
+            uploader: "TetoTime",
+            url: "https://example.com/kokoro",
+            isFile: false,
+            created: now - 86400000 * 2,
+            views: 0,
+            likes: 0,
+            comments: []
+        }
+    ];
+    saveVideos();
+}
+
+loadVideos();
+ensureDemoVideos();
+ /* ===== HOME PAGE ===== */
+function renderHome() {
+    const page = document.getElementById("page");
+    let html = `<h2>Home</h2><div class="video-grid">`;
+
+    for (const v of videos) {
+        html += `
+            <div class="video-card" onclick="renderWatch('${v.id}')">
+                <div class="video-thumb">${v.isFile ? "Uploaded" : "External"}</div>
+                <div class="video-title">${escapeHTML(v.title)}</div>
+                <div class="video-meta">${v.views} views</div>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    page.innerHTML = html;
+}
+
+/* ===== SEARCH PAGE ===== */
+function renderSearch() {
+    const page = document.getElementById("page");
+    page.innerHTML = `
+        <h2>Search</h2>
+        <div id="search-bar">
+            <input id="search-input" placeholder="Search videos...">
+            <button onclick="doSearch()">Search</button>
+        </div>
+        <div id="search-results"></div>
+    `;
+}
+
+function doSearch() {
+    const q = document.getElementById("search-input").value.toLowerCase();
+    const results = videos.filter(v => v.title.toLowerCase().includes(q));
+    const out = document.getElementById("search-results");
+
+    let html = "";
+    for (const v of results) {
+        html += `
+            <div class="video-card" onclick="renderWatch('${v.id}')">
+                <div class="video-thumb">${v.isFile ? "Uploaded" : "External"}</div>
+                <div class="video-title">${escapeHTML(v.title)}</div>
+                <div class="video-meta">${v.views} views</div>
+            </div>
+        `;
+    }
+
+    out.innerHTML = html || "<p>No results.</p>";
+}
+
+/* ===== REAL VIEWS ===== */
+function incrementView(id) {
+    const v = getVideoById(id);
+    if (!v) return;
+    v.views++;
+    saveVideos();
+}
+
+/* ===== COMMENTS ===== */
+function submitComment(id) {
+    const v = getVideoById(id);
+    if (!v) return;
+
+    const author = document.getElementById("com-author").value.trim();
+    const text = document.getElementById("com-text").value.trim();
+    if (!author || !text) return;
+
+    v.comments.push({ author, text });
+    saveVideos();
+    renderWatch(id);
+}
+
+/* ===== WATCH PAGE ===== */
+function renderWatch(id) {
+    currentVideoId = id;
+    incrementView(id);
+
+    const v = getVideoById(id);
+    if (!v) {
+        document.getElementById("page").innerHTML = "<p>Video not found.</p>";
+        return;
+    }
+
+    let videoHTML = "";
+    if (v.isFile) {
+        videoHTML = `
+            <video id="watch-video" controls autoplay>
+                <source src="${v.url}" type="video/mp4">
+                <source src="${v.url}" type="video/webm">
+            </video>
+        `;
+    } else {
+        videoHTML = `
+            <div id="watch-video" style="display:flex;align-items:center;justify-content:center;color:#fff;">
+                <a href="${v.url}" target="_blank" style="color:#fff;">Open External Video</a>
+            </div>
+        `;
+    }
+
+    let commentsHTML = "";
+    for (const c of v.comments) {
+        commentsHTML += `
+            <div class="comment">
+                <div class="comment-author">${escapeHTML(c.author)}</div>
+                <div class="comment-text">${escapeHTML(c.text)}</div>
+            </div>
+        `;
+    }
+
+    document.getElementById("page").innerHTML = `
+        <div id="watch-wrapper">
+            <div id="watch-layout">
+                <div id="watch-main">
+                    ${videoHTML}
+                    <div id="watch-title">${escapeHTML(v.title)}</div>
+                    <div id="watch-meta">${v.views} views • ${formatDate(v.created)} • Uploaded by ${escapeHTML(v.uploader)}</div>
+                    <div id="watch-description-box">${escapeHTML(v.description)}</div>
+                    <div id="watch-actions">
+                        <button onclick="likeVideo('${v.id}')">Like</button>
+                        <button onclick="renderHome()">Back to Home</button>
+                    </div>
+                    <div id="comments">
+                        <h3>Comments</h3>
+                        ${commentsHTML}
+                        <div id="comment-form">
+                            <input id="com-author" placeholder="Name">
+                            <textarea id="com-text" placeholder="Comment"></textarea>
+                            <button onclick="submitComment('${v.id}')">Post</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="watch-side">
+                    <h3>Related Videos</h3>
+                    ${renderWatchSidebarHTML(id)}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function renderWatchSidebarHTML(currentId) {
+    let html = "";
+    for (const v of videos) {
+        if (v.id === currentId) continue;
+        html += `
+            <div class="watch-reco-item" onclick="renderWatch('${v.id}')">
+                <div class="watch-reco-thumb">${v.isFile ? "Uploaded" : "External"}</div>
+                <div>
+                    <div class="watch-reco-title">${escapeHTML(v.title)}</div>
+                    <div class="watch-reco-meta">${v.views} views</div>
+                </div>
+            </div>
+        `;
+    }
+    return html;
+}
+
+/* ===== LIKE ===== */
+function likeVideo(id) {
+    const v = getVideoById(id);
+    if (!v) return;
+    v.likes++;
+    saveVideos();
+    renderWatch(id);
+}
+
+/* ===== START ===== */
+renderHome();
+</script>
+</body>
+</html>
